@@ -5,24 +5,15 @@ import 'package:medicine_reminder/add_medicine/ui/add_medicine.dart';
 import 'calender/ui/calender_screen.dart';
 import 'home/ui/home_screen.dart';
 import 'lay_out_controller.dart';
-import 'medicine_list/ui/medicine_list.dart'; // Import the controller
+import 'medicine_list/ui/medicine_list.dart';
+import 'profileScreen/ui/profile_screen.dart'; // Import the controller
 
 // Dummy Screens
 
 
-class ProfileScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(child: Text("Profile Screen"));
-  }
-}
 
-class SettingsScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(child: Text("Settings Screen"));
-  }
-}
+
+
 
 class BottomNavBar extends StatelessWidget {
   final BottomNavController navController = Get.put(BottomNavController());
@@ -32,7 +23,7 @@ class BottomNavBar extends StatelessWidget {
 
     CalendarScreen(),
     MedicineList(),
-    SettingsScreen(),
+    ProfileScreen(),
   ];
 
   @override

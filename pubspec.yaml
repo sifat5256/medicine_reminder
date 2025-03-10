@@ -39,6 +39,7 @@ dependencies:
   image_picker:
   smooth_page_indicator:
   syncfusion_flutter_calendar: ^28.2.5
+  fl_chart:
 
 dev_dependencies:
   flutter_test:
