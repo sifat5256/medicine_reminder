@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:medicine_reminder/splash/ui/splash_screen.dart';
 
 
 import 'auth_section/view/log_in_screen.dart';
@@ -37,7 +38,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home:  OnboardingScreen(),
+      home:  SplashScreen(),
     );
   }
 }
