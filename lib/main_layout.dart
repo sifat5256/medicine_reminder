@@ -7,6 +7,7 @@ import 'home/ui/home_screen.dart';
 import 'lay_out_controller.dart';
 import 'medicine_list/ui/medicine_list.dart';
 import 'medicine_storage_update/ui/medicine_storage_update_screen.dart';
+import 'prescrip[tion_document/ui/prescription_documnet_screen.dart';
 import 'profileScreen/ui/profile_screen.dart'; // Import the controller
 
 // Dummy Screens
@@ -57,10 +58,10 @@ class BottomNavBar extends StatelessWidget {
                 ),
               ),
               ListTile(
-                leading: Icon(Icons.home),
-                title: Text('Home'),
+                leading: Icon(Icons.upload_file_outlined),
+                title: Text('Document'),
                 onTap: () {
-                  // Add navigation logic
+                  Get.offAll(StorePrescriptionHealthDocument());
                 },
               ),
               ListTile(
