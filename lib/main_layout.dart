@@ -6,6 +6,7 @@ import 'calender/ui/calender_screen.dart';
 import 'home/ui/home_screen.dart';
 import 'lay_out_controller.dart';
 import 'medicine_list/ui/medicine_list.dart';
+import 'medicine_storage_update/ui/medicine_storage_update_screen.dart';
 import 'profileScreen/ui/profile_screen.dart'; // Import the controller
 
 // Dummy Screens
@@ -66,7 +67,7 @@ class BottomNavBar extends StatelessWidget {
                 leading: Icon(Icons.settings),
                 title: Text('Settings'),
                 onTap: () {
-                  // Add navigation logic
+                  Get.offAll(MedicineStorageUpdateScreen());
                 },
               ),
               ListTile(
