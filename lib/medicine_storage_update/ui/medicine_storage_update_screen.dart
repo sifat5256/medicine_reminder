@@ -1,146 +1,188 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:dotted_border/dotted_border.dart';
-
+import '../../add_medicine/controller/medicine_controller.dart';
 import '../../main_layout.dart';
 
-class Medicine {
-  String name;
-  String image;
-  String capacity;
-  int dosage;
-  int stock;
-
-  Medicine({
-    required this.name,
-    required this.image,
-    required this.capacity,
-    this.dosage = 1,
-    this.stock = 10,
-  });
-}
-
-class MedicineController extends GetxController {
-  var medicines = <Medicine>[].obs;
-
-  @override
-  void onInit() {
-    super.onInit();
-    medicines.addAll([
-      Medicine(name: "Paracetamol", image: "https://via.placeholder.com/50", capacity: "500mg"),
-      Medicine(name: "Ibuprofen", image: "https://via.placeholder.com/50", capacity: "200mg"),
-      Medicine(name: "Aspirin", image: "https://via.placeholder.com/50", capacity: "100mg"),
-    ]);
-  }
-
-  void updateDosage(int index, int dosage) {
-    medicines[index].dosage = dosage;
-    medicines.refresh();
-  }
-
-  void updateStock(int index, int stock) {
-    medicines[index].stock = stock;
-    medicines.refresh();
-  }
-}
-
 class MedicineStorageUpdateScreen extends StatefulWidget {
-  const MedicineStorageUpdateScreen({super.key});
-
   @override
   State<MedicineStorageUpdateScreen> createState() => _MedicineStorageUpdateScreenState();
 }
 
 class _MedicineStorageUpdateScreenState extends State<MedicineStorageUpdateScreen> {
-  final MedicineController controller = Get.put(MedicineController());
+  final MedicineController1 controller = Get.put(MedicineController1());
+
+  @override
+  void initState() {
+    super.initState();
+    // Load medicines and items on screen initialization
+    controller.loadMedicines();
+    controller.loadItems();
+  }
+
+  @override
+  void dispose() {
+    controller.searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-            onPressed: (){
-              Get.offAll(BottomNavBar());
-            },
-            icon: Icon(Icons.arrow_back_ios_new_outlined),),
+          onPressed: () {
+            Get.offAll(BottomNavBar());
+          },
+          icon: const Icon(Icons.arrow_back_ios_new_outlined),
+        ),
         backgroundColor: Colors.cyan,
         centerTitle: true,
-
-          title: const Text("Medicine Storage")),
-      body: Obx(
-            () => ListView.builder(
-          itemCount: controller.medicines.length,
-          itemBuilder: (context, index) {
-            final medicine = controller.medicines[index];
-            return TweenAnimationBuilder(
-              tween: Tween<Offset>(
-                begin: const Offset(1, 0), // Start from right
-                end: Offset.zero,
+        title: const Text("Medicine Storage"),
+      ),
+      body: Column(
+        children: [
+          // Search Bar
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(25),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.2),
+                    spreadRadius: 1,
+                    blurRadius: 5,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
               ),
-              duration: Duration(milliseconds: 500 * (index + 1)),
-              builder: (context, Offset offset, child) {
-                return Transform.translate(
-                  offset: offset,
-                  child: child,
+              child: TextField(
+                controller: controller.searchController,
+                decoration: InputDecoration(
+                  hintText: "Search medicines...",
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                  prefixIcon: const Icon(Icons.search, color: Colors.blueGrey),
+                  suffixIcon: controller.searchController.text.isNotEmpty
+                      ? IconButton(
+                    icon: const Icon(Icons.clear, color: Colors.blueGrey),
+                    onPressed: () {
+                      controller.searchController.clear();
+                      controller.update(); // Refresh the UI after clearing the search query
+                    },
+                  )
+                      : null,
+                ),
+                style: const TextStyle(color: Colors.blueGrey, fontSize: 16),
+              ),
+            ),
+          ),
+          // Medicine Storage List
+          Expanded(
+            child: Obx(
+                  () {
+                if (controller.filteredMedicines.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      "No medicines found!",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blueGrey,
+                      ),
+                    ),
+                  );
+                }
+
+                return ListView.builder(
+                  itemCount: controller.filteredMedicines.length,
+                  itemBuilder: (context, index) {
+                    final medicine = controller.filteredMedicines[index];
+                    return TweenAnimationBuilder(
+                      tween: Tween<Offset>(
+                        begin: const Offset(1, 0), // Start from right
+                        end: Offset.zero,
+                      ),
+                      duration: Duration(milliseconds: 500 * (index + 1)),
+                      builder: (context, Offset offset, child) {
+                        return Transform.translate(
+                          offset: offset,
+                          child: child,
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: DottedBorder(
+                          color: Colors.greenAccent,
+                          strokeWidth: 1.5,
+                          borderType: BorderType.RRect,
+                          radius: const Radius.circular(10),
+                          dashPattern: const [6, 3],
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.all(10),
+                            leading: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image.asset(
+                                medicine.imagePath ?? "assets/images/placeholder.png",
+                                width: 50,
+                                height: 50,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            title: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  medicine.title,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold, fontSize: 26),
+                                ),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    color: Colors.grey.shade200,
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      IconButton(
+                                        icon: const Icon(Icons.edit, color: Colors.blue),
+                                        onPressed: () => _showUpdateDialog(index, true),
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.add_box, color: Colors.green),
+                                        onPressed: () => _showUpdateDialog(index, false),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("Capacity: ${medicine.capacity}", style: const TextStyle(fontSize: 14)),
+                                Text("Dosage: ${medicine.dosage} times/day", style: const TextStyle(fontSize: 14)),
+                                Text(
+                                  "Stock: ${medicine.stock} remaining",
+                                  style: TextStyle(
+                                    color: medicine.stock <= 5 ? Colors.red : Colors.green,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 );
               },
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: DottedBorder(
-                  color: Colors.greenAccent,
-                  strokeWidth: 1.5,
-                  borderType: BorderType.RRect,
-                  radius: const Radius.circular(10),
-                  dashPattern: [6, 3],
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.all(10),
-                    leading: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.network(medicine.image, width: 50, height: 50, fit: BoxFit.cover),
-                    ),
-                    title: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          medicine.name,
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 26),
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            color: Colors.grey.shade200
-                          ),
-                          child: Row(
-
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.edit, color: Colors.blue),
-                                onPressed: () => _showUpdateDialog(index, true),
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.add_box, color: Colors.green),
-                                onPressed: () => _showUpdateDialog(index, false),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Capacity: ${medicine.capacity}", style: const TextStyle(fontSize: 14)),
-                        Text("Dosage: ${medicine.dosage} times/day", style: const TextStyle(fontSize: 14)),
-                        Text("Stock: ${medicine.stock} remaining", style: const TextStyle(color: Colors.redAccent, fontSize: 14)),
-                      ],
-                    ),
-
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
+            ),
+          ),
+        ],
       ),
     );
   }

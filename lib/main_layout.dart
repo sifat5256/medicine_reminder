@@ -25,7 +25,7 @@ class BottomNavBar extends StatelessWidget {
     HomeScreen(),
 
     CalendarScreen(),
-    MedicineList(),
+    MedicineListScreen(),
     ProfileScreen(),
   ];
 

@@ -1,12 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import '../controller/medicine_controller.dart';
+import '../model/add_mdecine_model.dart'; // Import the Medicine model
 
 class AddMedicine extends StatefulWidget {
-  final Function(String, String, File?) onSave;
-
-  AddMedicine({required this.onSave});
-
   @override
   _AddMedicineState createState() => _AddMedicineState();
 }
@@ -15,6 +14,7 @@ class _AddMedicineState extends State<AddMedicine> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descController = TextEditingController();
   File? _image;
+  final MedicineController1 _controller = Get.put(MedicineController1()); // Use Get.find
 
   Future<void> _pickImage(ImageSource source) async {
     final pickedFile = await ImagePicker().pickImage(source: source);
@@ -25,10 +25,29 @@ class _AddMedicineState extends State<AddMedicine> {
     }
   }
 
-  void _submitForm() {
+  Future<void> _submitForm() async {
     if (_titleController.text.isNotEmpty && _descController.text.isNotEmpty) {
-      widget.onSave(_titleController.text, _descController.text, _image);
+      // Add the new medicine
+      _controller.addItem(_titleController.text, _descController.text, _image);
+
+      // Clear the form
+      _titleController.clear();
+      _descController.clear();
+      setState(() {
+        _image = null;
+      });
+
+      // Show a success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Medicine saved successfully!')),
+      );
+
+      // Navigate back
       Navigator.pop(context);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please fill all fields!')),
+      );
     }
   }
 
