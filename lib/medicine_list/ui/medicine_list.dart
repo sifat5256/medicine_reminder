@@ -1,69 +1,135 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:medicine_reminder/add_reminder/ui/add_reminder.dart';
 import '../../add_medicine/ui/add_medicine.dart';
-// Import the MedicineDetail screen
+import '../controller/medicine_controller.dart';
 
-class MedicineList extends StatefulWidget {
-  @override
-  _MedicineListState createState() => _MedicineListState();
-}
+// Controller for managing the medicine list
 
-class _MedicineListState extends State<MedicineList> {
-  List<Map<String, dynamic>> items = [];
 
-  void _addItem(String title, String description, File? image) {
-    setState(() {
-      items.add({"title": title, "description": description, "image": image});
-    });
-  }
+class MedicineList extends StatelessWidget {
+  final MedicineController controller = Get.put(MedicineController());
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: items.isEmpty
-          ? Center(child: Text("No items added"))
-          : ListView.builder(
-        itemCount: items.length,
-        itemBuilder: (context, index) {
-          return FadeInDown(
-            child: Container(
-              child: ListTile(
-                title: Text(items[index]['title']),
-                subtitle: Text(items[index]['description']),
-                leading: items[index]['image'] != null
-                    ? Image.file(
-                  items[index]['image'],
-                  width: 50,
-                  height: 50,
-                  fit: BoxFit.cover,
-                )
-                    : Icon(Icons.image),
-                onTap: () {
-                  // Navigate to the detail screen and pass the item data
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => AddReminderScreen(
-                        item: items[index], // Pass the selected item
-                      ),
+      backgroundColor: Colors.grey.shade200,
+
+      body: Obx(
+            () => controller.items.isEmpty
+            ? Center(
+          child: Text(
+            "No items added",
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+        )
+            : ListView.builder(
+          itemCount: controller.items.length,
+          itemBuilder: (context, index) {
+            return FadeInDown(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 12.0, vertical: 6.0),
+                child: Dismissible(
+                  key: Key(controller.items[index]['title']),
+                  direction: DismissDirection.endToStart,
+                  background: Container(
+                    padding: EdgeInsets.only(right: 20),
+                    alignment: Alignment.centerRight,
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                  );
-                },
+                    child: Icon(Icons.delete, color: Colors.white),
+                  ),
+                  onDismissed: (direction) {
+                    controller.removeItem(index);
+                  },
+                  child: Container(
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+
+                    ),
+                    child: Row(
+                      children: [
+                        // Image (40%)
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.3,
+                          height: 80,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            image: controller.items[index]['image'] != null
+                                ? DecorationImage(
+                              image: FileImage(
+                                  controller.items[index]['image']),
+                              fit: BoxFit.cover,
+                            )
+                                : DecorationImage(
+                              image: AssetImage(
+                                  "assets/images/placeholder.png"),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 10),
+
+                        // Title & Subtitle (40%)
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                controller.items[index]['title'],
+                                style: TextStyle(
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.blueGrey.shade800,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                controller.items[index]['description'],
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.blueGrey.shade600,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        // Navigate Button (20%)
+                        IconButton(
+                          icon: Icon(
+                            Icons.arrow_forward_ios,
+                            color: Colors.blueGrey.shade700,
+                            size: 24,
+                          ),
+                          onPressed: () {
+                            Get.to(() => AddReminderScreen(
+                                item: controller.items[index]));
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => AddMedicine(onSave: _addItem),
-          ),
-        ),
+        backgroundColor: Colors.blueGrey,
+        child: Icon(Icons.add, color: Colors.white),
+        onPressed: () => Get.to(() => AddMedicine(onSave: controller.addItem)),
       ),
     );
   }

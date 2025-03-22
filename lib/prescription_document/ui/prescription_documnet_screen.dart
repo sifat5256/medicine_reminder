@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import '../../main_layout.dart';
 import '../controller/prescription_document_controller.dart';
 
 class StorePrescriptionHealthDocument extends StatefulWidget {
@@ -20,6 +21,10 @@ class _StorePrescriptionHealthDocumentState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+            onPressed: (){
+             Get.offAll(BottomNavBar()) ;
+            }, icon: Icon(Icons.navigate_before_outlined)),
         title: const Text('Health Documents'),
         backgroundColor: Colors.deepPurple,
         elevation: 0,

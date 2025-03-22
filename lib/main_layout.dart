@@ -2,12 +2,13 @@ import 'package:animate_do/animate_do.dart' show FadeInDown;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:medicine_reminder/add_medicine/ui/add_medicine.dart';
+import 'package:medicine_reminder/prescription_document/ui/prescription_documnet_screen.dart';
 import 'calender/ui/calender_screen.dart';
 import 'home/ui/home_screen.dart';
 import 'lay_out_controller.dart';
 import 'medicine_list/ui/medicine_list.dart';
 import 'medicine_storage_update/ui/medicine_storage_update_screen.dart';
-import 'prescrip[tion_document/ui/prescription_documnet_screen.dart';
+
 import 'profileScreen/ui/profile_screen.dart'; // Import the controller
 
 // Dummy Screens
